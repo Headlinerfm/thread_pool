@@ -8,7 +8,7 @@ class ThreadPool
   end
   
   def self.debug(msg)
-    logger.debug msg
+    logger.debug(msg) if @logger
   end
 
   class Executor
