@@ -11,6 +11,10 @@ class ThreadPool
     logger.debug(msg) if @logger
   end
 
+  def self.error(msg)
+    logger.error(msg) if @logger
+  end
+
   class Executor
     attr_reader :active
     
@@ -25,8 +29,8 @@ class ThreadPool
             begin
               block.call(*args)
             rescue Exception => e
-              error e.message
-              error e.backtrace.join("\n")
+              ThreadPool.error e.message
+              ThreadPool.error e.backtrace.join("\n")
             end
             block.complete = true
             ThreadPool.debug "Executor: complete   #{@tuple.hash}"
