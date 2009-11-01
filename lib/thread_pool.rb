@@ -1,12 +1,17 @@
 # Hooray 
 require "thread"
-require "rubygems"
-require "loggable"
+require "logger"
 
 class ThreadPool
-  include Loggable
+  def self.logger(dev = STDOUT)
+    @logger ||= Logger.new(dev)
+  end
+  
+  def self.debug(msg)
+    logger.debug msg
+  end
+
   class Executor
-    include Loggable
     attr_reader :active
     
     def initialize(queue, mutex)
@@ -14,7 +19,7 @@ class ThreadPool
         loop do
           mutex.synchronize { @tuple = queue.shift }
           if @tuple
-            debug "Executor: processing #{@tuple.hash}"
+            ThreadPool.debug "Executor: processing #{@tuple.hash}"
             args, block = @tuple
             @active = true
             begin
@@ -24,7 +29,7 @@ class ThreadPool
               error e.backtrace.join("\n")
             end
             block.complete = true
-            debug "Executor: complete   #{@tuple.hash}"
+            ThreadPool.debug "Executor: complete   #{@tuple.hash}"
           else
             @active = false
             sleep 0.01

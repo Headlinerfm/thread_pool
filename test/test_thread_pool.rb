@@ -1,6 +1,6 @@
 require "test/unit"
 require "timeout"
-require File.dirname(__FILE__) + "/../lib/thread_pool"
+require "thread_pool"
 
 class TestThreadPool < Test::Unit::TestCase
   THREADS = 10
@@ -15,6 +15,10 @@ class TestThreadPool < Test::Unit::TestCase
   
   def test_creation
     #implicit
+  end
+  
+  def test_logger
+    assert_instance_of Logger, ThreadPool.logger
   end
   
   def test_pool_size
@@ -52,7 +56,8 @@ class TestThreadPool < Test::Unit::TestCase
       @pool.execute(c) {|n| @foo << n }
     end
     @pool.join
-    assert_equal (0...5).to_a, @foo
+    expected = (0...5).to_a
+    assert expected.all?{|e| @foo.include?(e) }
   end
   
   def test_queue_limit
